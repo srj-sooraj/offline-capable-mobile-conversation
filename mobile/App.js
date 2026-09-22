@@ -192,6 +192,13 @@ export default function App() {
               placeholder="Type a message..."
               placeholderTextColor="#8E8E93"
               multiline
+              blurOnSubmit={false}
+              onKeyPress={(e) => {
+                if (e.nativeEvent.key === 'Enter' && !e.nativeEvent.shiftKey) {
+                  if (e.preventDefault) e.preventDefault();
+                  handleSend();
+                }
+              }}
             />
             <TouchableOpacity 
               style={[styles.sendBtn, !inputText.trim() && styles.sendBtnDisabled]} 

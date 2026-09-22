@@ -1,7 +1,7 @@
 # Submission Details
 
 ## Demo Video
-Demo video: [ADD ACCESSIBLE VIDEO LINK BEFORE SUBMISSION]
+Demo video: [Watch the demo video](https://drive.google.com/file/d/11xvngSgGIeXkQ7HfxbooZgDf290aQeUr/view?usp=sharing)
 
 ## Implementation Status
 - [x] Initialized Project Foundation
@@ -15,8 +15,8 @@ Demo video: [ADD ACCESSIBLE VIDEO LINK BEFORE SUBMISSION]
 Implementation is complete. The project implements a durable local outbox, strict FIFO synchronization, stable client-generated message IDs, server-side idempotency, bounded automatic retry, manual retry, deterministic failure simulation, and recovery from uncertain acknowledgements. Focused mobile and backend test suites pass successfully.
 
 ## Required Design Decisions
-1. **Durable outbox owner**: Client controls the lifecycle via AsyncStorage, guaranteeing persistence before network attempts.
-2. **Delivery state transitions**: Pending → Sending → Delivered or Failed. (Strictly ordered).
+1. **Durable outbox owner**: Client controls the lifecycle via AsyncStorage, persisting messages before network synchronization attempts.
+2. **Delivery state transitions**: Pending → Sending → Delivered or Failed. A failed message can be manually retried by transitioning back to Pending and then Sending.
 3. **Ordering policy**: Strict FIFO by local creation timestamp.
 4. **Ordering trade-off**: Strict FIFO blocks later messages if earlier ones fail permanently, maintaining causality but reducing throughput.
 5. **Connectivity-triggered synchronization**: Automatically attempts sync when the network goes online.
@@ -56,8 +56,8 @@ Result: Pass
 Evidence: Verified manually in browser UI and programmatically in `syncEngine.test.js` (offline mode prevents synchronization test).
 
 AC2 Force-close durability
-Result: Pass
-Evidence: Verified manually via browser reload durability and programmatically in `outboxStorage.test.js` (data persists to AsyncStorage). OS-level process termination was not performed.
+Result: Pass — persistence behavior verified; OS-level force-close automation was not performed.
+Evidence: Verified manually via browser reload/reopen and programmatically through outboxStorage.test.js, which verifies persistence through AsyncStorage.
 
 AC3 Reconnection synchronization
 Result: Pass
@@ -92,12 +92,12 @@ Evidence: Verified manually using the LOST_ACK simulation and programmatically t
 17. Observe automatic retry after the configured retry delay.
 18. Verify the same message becomes **Delivered**.
 19. Verify the backend contains exactly one logical record for that `messageId`.
-20. Verify the 10 queued messages were synchronized in documented FIFO order.
+20. Verify the 10 queued messages were synchronized in documented FIFO order using their client creation timestamps and backend records.
 21. Confirm no duplicate logical records exist for the benchmark messages.
 
 *(Note: Browser reload/reopen was manually verified; OS-level force-close automation was not performed. Durable persistence is covered by the persistence tests. The benchmark can be performed directly through the application's simulation controls without physically disconnecting the computer's network.)*
 
-## Exact Files Created / Modified
+## Key Files Created / Modified
 - `/mobile/src/sync/syncEngine.js` (NEW)
 - `/mobile/src/services/messageApi.js` (NEW)
 - `/mobile/src/config.js` (NEW)
@@ -109,9 +109,10 @@ Evidence: Verified manually using the LOST_ACK simulation and programmatically t
 - `/mobile/jest.config.js` and `babel.config.js` (NEW)
 
 ## Dependencies Installed
-- **Backend**: express, cors, dotenv, mongoose
-- **Mobile**: standard Expo dependencies, `@react-native-async-storage/async-storage`, `uuid`, `react-native-get-random-values`
-- **Mobile Dev**: `jest`, `@babel/preset-env`, `babel-jest`
+- Backend runtime: express, cors, dotenv, mongoose
+- Backend testing: jest, supertest, mongodb-memory-server
+- Mobile runtime: Expo, React Native, @react-native-async-storage/async-storage, uuid, react-native-get-random-values
+- Mobile testing/build: Jest and the Expo/Babel Jest configuration packages defined in package.json
 
 ## Commands to Run
 **Mobile**:
