@@ -53,10 +53,11 @@ The backend incorporates strict server-side idempotency using the client-generat
 
 ## How to Run Mobile
 1. Navigate to the mobile directory: `cd mobile`
-2. Install dependencies: `npm install`
-3. Start the Expo development server: `npm start`
-4. Use the Expo Go app on a physical device or a simulator to scan the QR code.
-5. To run the application in a desktop web browser for testing, use: `npm run web` (or press `w` in the Expo terminal).
+2. Create a `.env` file locally (do NOT commit this file). Optionally set `EXPO_PUBLIC_API_URL` to point to a custom backend URL if you are not using localhost.
+3. Install dependencies: `npm install`
+4. Start the Expo development server: `npm start`
+5. Use the Expo Go app on a physical device or a simulator to scan the QR code.
+6. To run the application in a desktop web browser for testing, use: `npm run web` (or press `w` in the Expo terminal).
 
 ### Simulation Testing (Reviewer)
 Use the UI controls to simulate network/backend state:
@@ -69,9 +70,10 @@ Use the UI controls to simulate network/backend state:
 
 ## How to Run Backend
 1. Navigate to the backend directory: `cd backend`
-2. Install dependencies: `npm install`
-3. Start the server: `node server.js`
-4. Check health at http://localhost:3000/health
+2. Create a `.env` file locally containing the required variables: `PORT` (default 3000) and `MONGODB_URI` (default `mongodb://localhost:27017/offline_conversation`). Do NOT commit your local `.env` file or create a `.env.example` template.
+3. Install dependencies: `npm install`
+4. Start the server: `node server.js`
+5. Check health at http://localhost:3000/health
 
 ## How to Run Tests
 ### Mobile Tests

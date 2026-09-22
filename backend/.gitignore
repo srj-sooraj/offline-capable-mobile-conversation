@@ -1,2 +1,5 @@
-.env.example
 .env
+.env.*
+node_modules/
+coverage/
+logs/
